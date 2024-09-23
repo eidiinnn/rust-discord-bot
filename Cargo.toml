@@ -4,3 +4,6 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+serenity = "0.12"
+dotenv = "0.15"
+tokio = { version = "1.21.2", features = ["macros", "rt-multi-thread"] }

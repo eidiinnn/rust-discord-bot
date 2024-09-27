@@ -14,7 +14,7 @@ struct IaResponse {
 
 pub async fn ia_ask(prompt: String) -> Result<String, Box<dyn std::error::Error>> {
     let client = Client::new();
-    let model = env::var("LLAMA_MODEL").expect("error to get the ia model");
+    let model = env::var("LLAMA_MODEL").expect("error to get the ia model from env");
 
     let payload = json!({
         "model": model,
@@ -23,7 +23,7 @@ pub async fn ia_ask(prompt: String) -> Result<String, Box<dyn std::error::Error>
 
     // Declare response as mutable
     let mut response = client
-        .post(env::var("LLAMA_API_URL").expect("error to get the ia api!"))
+        .post(env::var("LLAMA_API_URL").expect("error to get the ia api url from env"))
         .json(&payload)
         .send()
         .await?
@@ -40,8 +40,6 @@ pub async fn ia_ask(prompt: String) -> Result<String, Box<dyn std::error::Error>
             break;
         }
     }
-
-    println!("response {:?}", full_response);
 
     Ok(full_response)
 }

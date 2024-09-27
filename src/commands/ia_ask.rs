@@ -24,8 +24,8 @@ pub async fn run(
 
 fn say_with_ia_response(question: String, channel_id: Arc<ChannelId>, cache_http: Arc<Context>) {
     tokio::spawn(async move {
-      let p = ia_api::ia_ask(question).await.unwrap();
-      channel_id.say(cache_http.http.clone(), p).await
+      let ia_reponse = ia_api::ia_ask(question).await.unwrap();
+      channel_id.say(cache_http.http.clone(), ia_reponse).await
     });
 }
 

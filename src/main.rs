@@ -1,10 +1,11 @@
+mod ia_api;
 mod commands;
+use dotenv::dotenv;
 use serenity::all::{CreateInteractionResponse, CreateInteractionResponseMessage, GuildId, Ready};
 use serenity::async_trait;
 use serenity::model::application::Interaction;
 use serenity::prelude::*;
 use std::env;
-use dotenv::dotenv;
 
 struct Handler;
 
@@ -12,10 +13,9 @@ struct Handler;
 impl EventHandler for Handler {
     async fn interaction_create(&self, ctx: Context, interaction: Interaction) {
         if let Interaction::Command(command) = interaction {
-            println!("Received command interaction: {command:#?}");
-
             let content = match command.data.name.as_str() {
                 "ping" => Some(commands::ping::run(&command.data.options())),
+                "ask" => Some(commands::ia_ask::run(&command.data.options(), command.channel_id, &ctx).await),
                 _ => Some("not implemented :(".to_string()),
             };
 
@@ -40,7 +40,10 @@ impl EventHandler for Handler {
         );
 
         let _ = guild_id
-            .set_commands(&ctx.http, vec![commands::ping::register()])
+            .set_commands(
+                &ctx.http,
+                vec![commands::ping::register(), commands::ia_ask::register()],
+            )
             .await;
     }
 }

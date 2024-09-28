@@ -8,14 +8,14 @@ use serenity::model::application::ResolvedOption;
 pub async fn run(
     options: &Vec<ResolvedOption<'_>>,
     channel_id: ChannelId,
-    cache_http: &Context,
+    context: &Context,
 ) -> String {
     if let Some(ResolvedOption {
         value: ResolvedValue::String(string),
         ..
     }) = options.first()
     {
-        say_with_ia_response(string.to_string(), channel_id.into(), cache_http.clone().into());
+        say_with_ia_response(string.to_string(), channel_id.into(), context.clone().into());
         return format!("processing the message \"{}\"", string.to_string());
     } else {
         return "empty text".to_string();

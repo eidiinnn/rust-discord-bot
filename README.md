@@ -19,7 +19,7 @@ LLAMA_API_URL=http://localhost:11434/api/generate
 LLAMA_MODEL=llama3
 ```
 
-### Clone and start the projet
+### Clone and start the project
 ```bash
   git clone https://github.com/eidiinnn/rust-discord-bot
   cd rust-discord-bot

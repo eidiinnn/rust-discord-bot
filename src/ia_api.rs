@@ -16,7 +16,7 @@ pub async fn ia_ask(prompt: String, model: &str) -> Result<String, Box<dyn std::
 
     let payload = json!({
         "model": model,
-        "prompt": format!("ask this anwser with max 300 characters: {}", prompt),
+        "prompt": prompt,
         "stream": false
     });
 

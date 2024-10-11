@@ -1,5 +1,6 @@
 mod ia_api;
 mod commands;
+mod common;
 use dotenv::dotenv;
 use serenity::all::{CreateInteractionResponse, CreateInteractionResponseMessage, GuildId, Ready};
 use serenity::async_trait;

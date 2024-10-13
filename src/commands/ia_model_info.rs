@@ -19,29 +19,41 @@ pub async fn run(
             channel_id.into(),
             context.clone().into(),
         );
-        return format!("processing the message \"{}\"", string.to_string());
+        return format!("Looking for model: \"{}\"", string.to_string());
     } else {
         return "empty text".to_string();
     }
 }
 
-fn say_with_ia_response(question: String, channel_id: Arc<ChannelId>, cache_http: Arc<Context>) {
+fn say_with_ia_response(model_name: String, channel_id: Arc<ChannelId>, cache_http: Arc<Context>) {
     tokio::spawn(async move {
         let typing = channel_id.start_typing(&cache_http.http.clone());
-        let ia_reponse = ia_api::ia_ask::ask(question, &crate::common::NORMAL_LLAMA_MODEL)
-            .await
-            .unwrap();
-        let _ = channel_id.say(cache_http.http.clone(), ia_reponse).await;
+        let model = &model_name.as_str();
+
+        let ia_info = ia_api::ia_model::get_info_from_model(&model).await.unwrap();
+
+        let text = format!(
+            "Parent model: {}\nformat: {}\nfamily: {}\nfamilies: {:?}\nparameter size: {}\nquantization level: {}",
+            ia_info.details.parent_model,
+            ia_info.details.format,
+            ia_info.details.family,
+            ia_info.details.families,
+            ia_info.details.parameter_size,
+            ia_info.details.quantization_level,
+        );
+
+        let _ = channel_id.say(cache_http.http.clone(), text).await;
+
         typing.stop();
     });
 }
 
 pub fn register() -> CreateCommand {
-    CreateCommand::new("ask")
-        .description("Ask for ia")
+    CreateCommand::new("ia_model_info")
+        .description("get ia model details")
         .add_option(CreateCommandOption::new(
             serenity::all::CommandOptionType::String,
             "text",
-            "text",
+            "model name",
         ))
 }

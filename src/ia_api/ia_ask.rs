@@ -1,17 +1,16 @@
-use std::env;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 
 #[derive(Serialize, Deserialize, Debug)]
-struct IaResponse {
+pub struct IaResponse {
     model: String,
     created_at: String,
     response: String,
     done: bool,
 }
 
-pub async fn ia_ask(prompt: String, model: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn ask(prompt: String, model: &str) -> Result<String, Box<dyn std::error::Error>> {
     let client = Client::new();
 
     let payload = json!({
@@ -21,10 +20,11 @@ pub async fn ia_ask(prompt: String, model: &str) -> Result<String, Box<dyn std::
     });
 
     let response = client
-        .post(env::var("LLAMA_API_URL").expect("error to get the ia api url from env"))
+        .post(format!("{}/generate", &crate::common::LLAMA_API_URL))
         .json(&payload)
         .send()
-        .await.unwrap();
+        .await
+        .unwrap();
 
     let json: IaResponse = response.json().await.unwrap();
     Ok(json.response)

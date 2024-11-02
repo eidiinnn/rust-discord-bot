@@ -10,8 +10,13 @@ I Recomend to use a computer with GPU, if you don't have it, remove the `--gpus=
   docker exec -it ollama ollama run llama3
 ```
 More informatation on: https://hub.docker.com/r/ollama/ollama
+### Project clone
+```bash
+  git clone https://github.com/eidiinnn/rust-discord-bot
+  cd rust-discord-bot
+```
 
-### Setup the .env file
+### .env file Setup
 ```
 GUILD_ID=The Discord server guild
 TOKEN=Your Discord token
@@ -19,10 +24,8 @@ LLAMA_API_URL=http://localhost:11434/api/generate
 LLAMA_MODEL=llama3
 ```
 
-### Clone and start the project
+### Start the project
 ```bash
-  git clone https://github.com/eidiinnn/rust-discord-bot
-  cd rust-discord-bot
   cargo run
 ```
 ### Bot usage

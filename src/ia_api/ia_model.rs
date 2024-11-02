@@ -1,7 +1,8 @@
-use std::collections::HashMap;
-use reqwest::Client;
+use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
+use std::collections::HashMap;
+use std::error::Error;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ModelDetails {
@@ -45,16 +46,17 @@ pub struct ModelInfo {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct IaResponse {
     pub system: Option<String>,
-    pub license: String,
-    pub parameters: String,
-    pub template: String,
-    pub details: ModelDetails,
-    pub modified_at: String,
+    pub license: Option<String>,
+    pub parameters: Option<String>,
+    pub template: Option<String>,
+    pub details: Option<ModelDetails>,
+    pub modified_at: Option<String>,
+    pub error: Option<String>,
     #[serde(flatten)]
     extra: HashMap<String, serde_json::Value>,
 }
 
-pub async fn get_info_from_model(model: &str) -> Result<IaResponse, Box<dyn std::error::Error>> {
+pub async fn get_info_from_model(model: &str) -> Result<IaResponse, std::io::Error> {
     let client = Client::new();
 
     let payload = json!({
@@ -67,12 +69,48 @@ pub async fn get_info_from_model(model: &str) -> Result<IaResponse, Box<dyn std:
         .send()
         .await
         .expect("error to get the api response");
+    let status = response.status();
 
     let text_value = response
         .text()
         .await
         .expect("error to get the body in text form");
 
-    let json: IaResponse = serde_json::from_str(text_value.as_str()).unwrap();
+    let json: IaResponse =
+        serde_json::from_str(text_value.as_str()).expect("Error to parse the json");
+
+    if status != StatusCode::OK || json.error.is_some() {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!("Request error status={:?} body={:?}", status, json.error),
+        ));
+    }
+
     Ok(json)
+}
+
+pub async fn create_ai_model(name: &str, model_file: &str) -> Result<(), std::io::Error> {
+    let client = Client::new();
+
+    let payload = json!({
+       "name": name,
+       "modelfile": model_file,
+    });
+
+    let request = client
+        .post(format!("{}/create", &crate::common::LLAMA_API_URL))
+        .json(&payload)
+        .send()
+        .await
+        .expect("Error to create a ia model");
+    let status = request.status();
+
+    if status != StatusCode::OK {
+        return Err(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            request.text().await.unwrap(),
+        ));
+    }
+
+    Ok(())
 }

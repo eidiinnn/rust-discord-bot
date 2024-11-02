@@ -32,14 +32,29 @@ fn say_with_ia_response(model_name: String, channel_id: Arc<ChannelId>, cache_ht
 
         let ia_info = ia_api::ia_model::get_info_from_model(&model).await.unwrap();
 
+        if ia_info.details.is_none() || ia_info.error.is_some() {
+            if ia_info.error.is_some() {
+                let _ = channel_id
+                    .say(cache_http.http.clone(), ia_info.error.unwrap())
+                    .await;
+            } else {
+                let _ = channel_id
+                    .say(cache_http.http.clone(), "unknow error")
+                    .await;
+            }
+            return ();
+        }
+
+        let details = ia_info.details.unwrap();
+
         let text = format!(
             "Parent model: {}\nformat: {}\nfamily: {}\nfamilies: {:?}\nparameter size: {}\nquantization level: {}",
-            ia_info.details.parent_model,
-            ia_info.details.format,
-            ia_info.details.family,
-            ia_info.details.families,
-            ia_info.details.parameter_size,
-            ia_info.details.quantization_level,
+            details.parent_model,
+            details.format,
+            details.family,
+            details.families,
+            details.parameter_size,
+            details.quantization_level,
         );
 
         let _ = channel_id.say(cache_http.http.clone(), text).await;
@@ -49,8 +64,8 @@ fn say_with_ia_response(model_name: String, channel_id: Arc<ChannelId>, cache_ht
 }
 
 pub fn register() -> CreateCommand {
-    CreateCommand::new("ia_model_info")
-        .description("get ia model details")
+    CreateCommand::new("model")
+        .description("get IA model information")
         .add_option(CreateCommandOption::new(
             serenity::all::CommandOptionType::String,
             "text",

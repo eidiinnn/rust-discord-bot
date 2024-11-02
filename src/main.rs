@@ -1,6 +1,7 @@
 mod commands;
 mod common;
 mod ia_api;
+use common::{RPG_LLAMA_MODEL, RPG_LLAMA_MODEL_FILE};
 use dotenv::dotenv;
 use serenity::all::{CreateInteractionResponse, CreateInteractionResponseMessage, GuildId, Ready};
 use serenity::async_trait;
@@ -20,7 +21,8 @@ impl EventHandler for Handler {
                     commands::ia_ask::run(&command.data.options(), command.channel_id, &ctx).await,
                 ),
                 "ia_model_info" => Some(
-                    commands::ia_model_info::run(&command.data.options(), command.channel_id, &ctx).await,
+                    commands::ia_model_info::run(&command.data.options(), command.channel_id, &ctx)
+                        .await,
                 ),
                 _ => Some("not implemented :(".to_string()),
             };
@@ -60,6 +62,8 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
+    setup_rpg_ia_model().await;
+
     dotenv().ok();
     let token = env::var("TOKEN").expect("Expected a token in the environment");
     let intents = GatewayIntents::GUILD_MESSAGES
@@ -71,7 +75,24 @@ async fn main() {
         .await
         .expect("Err creating client");
 
-    if let Err(why) = client.start().await {
-        println!("Client error: {why:?}");
+    match client.start().await {
+        Ok(_) => println!("Bot connected!"),
+        Err(why) => println!("Client error: {why:?}"),
+    }
+}
+
+async fn setup_rpg_ia_model() {
+    match ia_api::ia_model::get_info_from_model(&RPG_LLAMA_MODEL).await {
+        Ok(_) => {
+            println!("RPG IA has defined");
+        }
+        Err(_) => {
+            match ia_api::ia_model::create_ai_model(&RPG_LLAMA_MODEL, &RPG_LLAMA_MODEL_FILE).await {
+                Ok(_) => println!("RPG IA defined"),
+                Err(error) => {
+                    panic!("Error to define the IA {:?}", error);
+                }
+            }
+        }
     }
 }

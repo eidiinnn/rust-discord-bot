@@ -10,13 +10,14 @@ pub struct IaResponse {
     done: bool,
 }
 
-pub async fn ask(prompt: String, model: &str) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn ask(prompt: String, model: String, context: Option<Vec<i16>>) -> Result<String, Box<dyn std::error::Error>> {
     let client = Client::new();
 
     let payload = json!({
         "model": model,
         "prompt": prompt,
-        "stream": false
+        "stream": false,
+        "context": context,
     });
 
     let response = client

@@ -82,17 +82,10 @@ async fn main() {
 }
 
 async fn setup_rpg_ia_model() {
-    match ia_api::ia_model::get_info_from_model(&RPG_LLAMA_MODEL).await {
-        Ok(_) => {
-            println!("RPG IA has defined");
-        }
-        Err(_) => {
-            match ia_api::ia_model::create_ai_model(&RPG_LLAMA_MODEL, &RPG_LLAMA_MODEL_FILE).await {
-                Ok(_) => println!("RPG IA defined"),
-                Err(error) => {
-                    panic!("Error to define the IA {:?}", error);
-                }
-            }
+    match ia_api::ia_model::create_ai_model(&RPG_LLAMA_MODEL, &RPG_LLAMA_MODEL_FILE).await {
+        Ok(_) => println!("RPG IA defined"),
+        Err(error) => {
+            panic!("Error to define the IA {:?}", error);
         }
     }
 }

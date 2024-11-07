@@ -1,6 +1,7 @@
 mod commands;
 mod common;
 mod ia_api;
+mod tools;
 use common::{RPG_LLAMA_MODEL, RPG_LLAMA_MODEL_FILE};
 use dotenv::dotenv;
 use serenity::all::{CreateInteractionResponse, CreateInteractionResponseMessage, GuildId, Ready};
@@ -8,6 +9,7 @@ use serenity::async_trait;
 use serenity::model::application::Interaction;
 use serenity::prelude::*;
 use std::env;
+use tools::log::CustomLog;
 
 struct Handler;
 
@@ -62,6 +64,7 @@ impl EventHandler for Handler {
 
 #[tokio::main]
 async fn main() {
+    let log = CustomLog::new(String::from("[Discord Bot] [Setup]"));
     setup_rpg_ia_model().await;
 
     dotenv().ok();
@@ -75,17 +78,22 @@ async fn main() {
         .await
         .expect("Err creating client");
 
+    log.info(String::from("Connecting on discord bot..."));
     match client.start().await {
-        Ok(_) => println!("Bot connected!"),
-        Err(why) => println!("Client error: {why:?}"),
+        Ok(_) => log.info(String::from("Bot connected!")),
+        Err(why) => log.error(format!("Client error: {why:?}")),
     }
 }
 
 async fn setup_rpg_ia_model() {
+    let log = CustomLog::new(String::from("[RPG IA] [Setup]"));
+
     match ia_api::ia_model::create_ai_model(&RPG_LLAMA_MODEL, &RPG_LLAMA_MODEL_FILE).await {
-        Ok(_) => println!("RPG IA defined"),
+        Ok(_) => log.info(String::from("RPG IA Created")),
         Err(error) => {
-            panic!("Error to define the IA {:?}", error);
+            let error = format!("Error to define the IA {:?}", error);
+            log.error(String::from(error));
+            panic!();
         }
     }
 }

@@ -1,9 +1,14 @@
 use crate::ia_api;
+use crate::ia_api::ia_ask::IaResponse;
+use crate::ia_context::{get_context, save_context};
+use crate::redis::REDIS_CONNECTION;
 use crate::tools::log::CustomLog;
 use once_cell::sync::Lazy;
-use serenity::all::{ChannelId, Context, CreateCommandOption, ResolvedValue};
+use redis::cmd;
+use serenity::all::{ChannelId, Context, CreateCommandOption, ResolvedValue, UserId};
 use serenity::builder::CreateCommand;
 use serenity::model::application::ResolvedOption;
+use std::borrow::Borrow;
 use std::sync::Arc;
 
 static LOG: Lazy<CustomLog> = Lazy::new(|| CustomLog::new(String::from("[Command] [IA Ask]")));
@@ -11,6 +16,7 @@ static LOG: Lazy<CustomLog> = Lazy::new(|| CustomLog::new(String::from("[Command
 pub async fn run(
     options: &Vec<ResolvedOption<'_>>,
     channel_id: ChannelId,
+    user_id: UserId,
     context: &Context,
 ) -> String {
     let mut model: Option<String> = None;
@@ -34,6 +40,7 @@ pub async fn run(
         say_with_ia_response(
             string.to_string(),
             channel_id.into(),
+            user_id.clone().into(),
             context.clone().into(),
             model,
         );
@@ -46,22 +53,32 @@ pub async fn run(
 
 fn say_with_ia_response(
     question: String,
-    channel_id: Arc<ChannelId>,
-    cache_http: Arc<Context>,
+    channel_id: ChannelId,
+    user_id: UserId,
+    cache_http: Context,
     model: Option<String>,
 ) {
     tokio::spawn(async move {
         let typing = channel_id.start_typing(&cache_http.http.clone());
+
+        let context = get_context(user_id.to_string()).unwrap();
 
         let model: String = match model {
             Some(model) => model,
             None => (&crate::common::NORMAL_LLAMA_MODEL).to_string(),
         };
 
-        let ia_reponse = ia_api::ia_ask::ask(question, model, None).await.unwrap();
+        let ia_response: IaResponse = ia_api::ia_ask::ask(question, model, context).await.unwrap();
 
-        LOG.info(format!("receive the response from ia \"{:?}\"", ia_reponse));
-        let _ = channel_id.say(cache_http.http.clone(), ia_reponse).await;
+        let _ = save_context(user_id.to_string(), ia_response.context).unwrap();
+
+        LOG.info(format!(
+            "receive the response from ia \"{:?}\"",
+            ia_response.response
+        ));
+        let _ = channel_id
+            .say(cache_http.http.clone(), ia_response.response)
+            .await;
         typing.stop();
     });
 }

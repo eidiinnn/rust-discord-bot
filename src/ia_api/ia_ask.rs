@@ -4,13 +4,14 @@ use serde_json::json;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct IaResponse {
-    model: String,
-    created_at: String,
-    response: String,
-    done: bool,
+    pub model: String,
+    pub created_at: String,
+    pub response: String,
+    pub done: bool,
+    pub context: Vec<i32>
 }
 
-pub async fn ask(prompt: String, model: String, context: Option<Vec<i16>>) -> Result<String, Box<dyn std::error::Error>> {
+pub async fn ask(prompt: String, model: String, context: Option<Vec<i32>>) -> Result<IaResponse, Box<dyn std::error::Error>> {
     let client = Client::new();
 
     let payload = json!({
@@ -28,5 +29,5 @@ pub async fn ask(prompt: String, model: String, context: Option<Vec<i16>>) -> Re
         .unwrap();
 
     let json: IaResponse = response.json().await.unwrap();
-    Ok(json.response)
+    Ok(json)
 }

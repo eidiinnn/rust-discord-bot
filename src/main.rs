@@ -2,6 +2,8 @@ mod commands;
 mod common;
 mod ia_api;
 mod tools;
+mod redis;
+mod ia_context;
 use common::{RPG_LLAMA_MODEL, RPG_LLAMA_MODEL_FILE};
 use dotenv::dotenv;
 use serenity::all::{CreateInteractionResponse, CreateInteractionResponseMessage, GuildId, Ready};
@@ -25,7 +27,7 @@ impl EventHandler for Handler {
             let content = match command.data.name.as_str() {
                 "ping" => Some(commands::ping::run(&command.data.options())),
                 "ask" => Some(
-                    commands::ia_ask::run(&command.data.options(), command.channel_id, &ctx).await,
+                    commands::ia_ask::run(&command.data.options(), command.channel_id, command.user.id, &ctx).await,
                 ),
                 "ia_model_info" => Some(
                     commands::ia_model_info::run(&command.data.options(), command.channel_id, &ctx)

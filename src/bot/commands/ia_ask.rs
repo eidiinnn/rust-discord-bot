@@ -68,12 +68,7 @@ fn say_with_ia_response(
             .await
             .unwrap();
 
-        let _ = save_context(
-            &user_id,
-            Some(&model),
-            &ia_response.context,
-        )
-        .unwrap();
+        let _ = save_context(&user_id, Some(&model), &ia_response.context).unwrap();
 
         LOG.info(format!(
             "receive the response from ia \"{:?}\"",

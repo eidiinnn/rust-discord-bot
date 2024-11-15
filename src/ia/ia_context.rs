@@ -5,7 +5,11 @@ use std::error::Error;
 
 pub type RedisResult<T> = Result<T, Box<dyn Error>>;
 
-pub fn save_context(user_id: &String, model: Option<&String>, context: &Vec<i32>) -> RedisResult<()> {
+pub fn save_context(
+    user_id: &String,
+    model: Option<&String>,
+    context: &Vec<i32>,
+) -> RedisResult<()> {
     let json_string = serde_json::to_string(&context)?;
     let mut connection = REDIS_CONNECTION.get_connection()?;
 
@@ -31,6 +35,16 @@ pub fn get_context(user_id: &String, model: Option<&String>) -> RedisResult<Opti
         }
         None => Ok(None),
     }
+}
+
+pub fn delete_context(user_id: &String, model: Option<&String>) -> RedisResult<()> {
+    let mut connection = REDIS_CONNECTION.get_connection()?;
+
+    redis::cmd("DEL")
+        .arg(get_context_db_name(user_id, model))
+        .exec(&mut connection)?;
+
+    Ok(())
 }
 
 fn get_context_db_name(user_id: &String, model: Option<&String>) -> String {

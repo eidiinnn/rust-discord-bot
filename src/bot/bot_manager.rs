@@ -32,6 +32,10 @@ impl EventHandler for Handler {
                     commands::ia_model_info::run(&command.data.options(), command.channel_id, &ctx)
                         .await,
                 ),
+                "delete_context" => Some(commands::delete_context::run(
+                    &command.data.options(),
+                    command.user.id,
+                )),
                 _ => Some("not implemented :(".to_string()),
             };
 
@@ -62,6 +66,7 @@ impl EventHandler for Handler {
                     commands::ping::register(),
                     commands::ia_ask::register(),
                     commands::ia_model_info::register(),
+                    commands::delete_context::register(),
                 ],
             )
             .await;

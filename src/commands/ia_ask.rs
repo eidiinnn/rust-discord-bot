@@ -60,17 +60,25 @@ fn say_with_ia_response(
 ) {
     tokio::spawn(async move {
         let typing = channel_id.start_typing(&cache_http.http.clone());
-
-        let context = get_context(user_id.to_string()).unwrap();
+        let user_id = user_id.to_string();
 
         let model: String = match model {
             Some(model) => model,
             None => (&crate::common::NORMAL_LLAMA_MODEL).to_string(),
         };
 
-        let ia_response: IaResponse = ia_api::ia_ask::ask(question, model, context).await.unwrap();
+        let context = get_context(&user_id, Some(&model)).unwrap();
 
-        let _ = save_context(user_id.to_string(), ia_response.context).unwrap();
+        let ia_response: IaResponse = ia_api::ia_ask::ask(question, model.clone(), context)
+            .await
+            .unwrap();
+
+        let _ = save_context(
+            &user_id,
+            Some(&model),
+            &ia_response.context,
+        )
+        .unwrap();
 
         LOG.info(format!(
             "receive the response from ia \"{:?}\"",

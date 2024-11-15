@@ -6,7 +6,7 @@ use serenity::builder::CreateCommand;
 use serenity::model::application::ResolvedOption;
 use std::sync::Arc;
 
-static LOG: Lazy<CustomLog> = Lazy::new(|| CustomLog::new(String::from("[Command] [Modal Info]")));
+static LOG: Lazy<CustomLog> = Lazy::new(|| CustomLog::new(String::from("[Command] [Model Info]")));
 
 pub async fn run(
     options: &Vec<ResolvedOption<'_>>,

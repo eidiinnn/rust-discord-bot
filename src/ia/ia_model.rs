@@ -2,7 +2,6 @@ use reqwest::{Client, StatusCode};
 use serde::{Deserialize, Serialize};
 use serde_json::json;
 use std::collections::HashMap;
-use std::error::Error;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ModelDetails {

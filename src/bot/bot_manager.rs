@@ -40,6 +40,15 @@ impl EventHandler for Handler {
                     commands::ia_model_info::run(&command.data.options(), command.channel_id, &ctx)
                         .await,
                 ),
+                "play_rpg" => Some(
+                    commands::play_rpg::run(
+                        &command.data.options(),
+                        command.channel_id,
+                        command.user.clone(),
+                        &ctx,
+                    )
+                    .await,
+                ),
                 _ => Some("not implemented :(".to_string()),
             };
 
@@ -71,6 +80,7 @@ impl EventHandler for Handler {
                     commands::ia_ask::register(),
                     commands::ia_model_info::register(),
                     commands::delete_context::register(),
+                    commands::play_rpg::register(),
                 ],
             )
             .await;

@@ -65,7 +65,7 @@ fn start_rpg_section(channel_id: ChannelId, user_id: User, cache_http: Context) 
                 .unwrap();
 
                 channel_id
-                    .say(cache_http.http.clone(), String::from("Session deleted!"))
+                    .say(cache_http.http.clone(), String::from("Session ended!"))
                     .await
                     .unwrap();
 

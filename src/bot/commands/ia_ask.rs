@@ -64,7 +64,7 @@ fn say_with_ia_response(
 
         let context = get_context(&user_id, Some(&model)).unwrap();
 
-        let ia_response: IaResponse = crate::ia::ia_ask::ask(question, model.clone(), context)
+        let ia_response: IaResponse = crate::ia::ia_ask::ask(&question, &model, context)
             .await
             .unwrap();
 

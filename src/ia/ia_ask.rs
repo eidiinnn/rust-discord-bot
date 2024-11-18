@@ -11,7 +11,7 @@ pub struct IaResponse {
     pub context: Vec<i32>
 }
 
-pub async fn ask(prompt: String, model: String, context: Option<Vec<i32>>) -> Result<IaResponse, Box<dyn std::error::Error>> {
+pub async fn ask(prompt: &String, model: &String, context: Option<Vec<i32>>) -> Result<IaResponse, Box<dyn std::error::Error>> {
     let client = Client::new();
 
     let payload = json!({

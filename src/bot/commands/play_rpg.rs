@@ -30,6 +30,7 @@ fn start_rpg_section(channel_id: ChannelId, user_id: User, cache_http: Context) 
             .await
             .unwrap();
 
+        let model = crate::common::RPG_LLAMA_MODEL.to_string();
         let mut last_id: MessageId = rpg_theme_choose_msg.id;
         let http = &cache_http.http;
 
@@ -50,6 +51,7 @@ fn start_rpg_section(channel_id: ChannelId, user_id: User, cache_http: Context) 
                     channel_id,
                     user_id.clone().into(),
                     cache_http.clone(),
+                    &model,
                 )
                 .await;
                 last_id = id;
@@ -58,7 +60,7 @@ fn start_rpg_section(channel_id: ChannelId, user_id: User, cache_http: Context) 
             if messages.len() > 0 && messages[0].content == "/exit".to_string() {
                 let _ = delete_context(
                     &user_id.id.to_string(),
-                    Some(&crate::common::RPG_LLAMA_MODEL.to_string()),
+                    Some(&model),
                 )
                 .unwrap();
 
@@ -78,15 +80,14 @@ async fn make_prompt(
     channel_id: ChannelId,
     user_id: UserId,
     cache_http: Context,
+    model: &String,
 ) -> MessageId {
     let typing = channel_id.start_typing(&cache_http.http.clone());
     let user_id = user_id.to_string();
 
-    let model: String = (&crate::common::RPG_LLAMA_MODEL).to_string();
-
     let context = get_context(&user_id, Some(&model)).unwrap();
 
-    let ia_response: IaResponse = crate::ia::ia_ask::ask(action, model.clone(), context)
+    let ia_response: IaResponse = crate::ia::ia_ask::ask(&action, &model, context)
         .await
         .unwrap();
 

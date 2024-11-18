@@ -4,12 +4,10 @@ use crate::tools::log::CustomLog;
 use once_cell::sync::Lazy;
 use serenity::all::{ChannelId, Context, GetMessages, MessageId, User, UserId};
 use serenity::builder::CreateCommand;
-use serenity::model::application::ResolvedOption;
 
 static LOG: Lazy<CustomLog> = Lazy::new(|| CustomLog::new(String::from("[Command] [IA RPG]")));
 
 pub async fn run(
-    options: &Vec<ResolvedOption<'_>>,
     channel_id: ChannelId,
     user_id: User,
     context: &Context,

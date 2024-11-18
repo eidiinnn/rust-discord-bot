@@ -41,13 +41,7 @@ impl EventHandler for Handler {
                         .await,
                 ),
                 "play_rpg" => Some(
-                    commands::play_rpg::run(
-                        &command.data.options(),
-                        command.channel_id,
-                        command.user.clone(),
-                        &ctx,
-                    )
-                    .await,
+                    commands::play_rpg::run(command.channel_id, command.user.clone(), &ctx).await,
                 ),
                 _ => Some("not implemented :(".to_string()),
             };

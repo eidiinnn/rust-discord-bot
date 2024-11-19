@@ -39,12 +39,9 @@ pub fn get_context(user_id: &String, model: Option<&String>) -> RedisResult<Opti
 
 pub fn delete_context(user_id: &String, model: Option<&String>) -> RedisResult<()> {
     let mut connection = REDIS_CONNECTION.get_connection()?;
-    let key = get_context_db_name(user_id, model);
-
-    println!("{:?}", key);
 
     redis::cmd("DEL")
-        .arg(key)
+        .arg(get_context_db_name(user_id, model))
         .exec(&mut connection)?;
 
     Ok(())

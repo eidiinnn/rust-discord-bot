@@ -7,11 +7,7 @@ use serenity::builder::CreateCommand;
 
 static LOG: Lazy<CustomLog> = Lazy::new(|| CustomLog::new(String::from("[Command] [IA RPG]")));
 
-pub async fn run(
-    channel_id: ChannelId,
-    user_id: User,
-    context: &Context,
-) -> String {
+pub async fn run(channel_id: ChannelId, user_id: User, context: &Context) -> String {
     start_rpg_section(
         channel_id.into(),
         user_id.clone().into(),
@@ -42,10 +38,18 @@ fn start_rpg_section(channel_id: ChannelId, user_id: User, cache_http: Context) 
                 .await
                 .unwrap();
 
-            if messages.len() > 0
-                && messages[0].author == user_id
-                && messages[0].content != "/exit".to_string()
-            {
+            if messages.len() > 0 && messages[0].author == user_id {
+                let last_message = &messages[0];
+
+                if last_message.content == "/exit".to_string() {
+                    let _ = delete_context(&user_id.id.to_string(), Some(&model)).unwrap();
+                    channel_id
+                        .say(cache_http.http.clone(), String::from("Session ended!"))
+                        .await
+                        .unwrap();
+                    break;
+                }
+
                 let id = make_prompt(
                     messages[0].content.clone(),
                     channel_id,
@@ -55,21 +59,6 @@ fn start_rpg_section(channel_id: ChannelId, user_id: User, cache_http: Context) 
                 )
                 .await;
                 last_id = id;
-            };
-
-            if messages.len() > 0 && messages[0].content == "/exit".to_string() {
-                let _ = delete_context(
-                    &user_id.id.to_string(),
-                    Some(&model),
-                )
-                .unwrap();
-
-                channel_id
-                    .say(cache_http.http.clone(), String::from("Session ended!"))
-                    .await
-                    .unwrap();
-
-                break;
             }
         }
     });

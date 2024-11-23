@@ -1,45 +1,26 @@
 {
-   // Use IntelliSense to learn about possible attributes.
-   // Hover to view descriptions of existing attributes.
-   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-   "version": "0.2.0",
-   "configurations": [
-      {
-         "type": "lldb",
-         "request": "launch",
-         "name": "Debug executable 'rust-discord-bot'",
-         "cargo": {
-            "args": [
-               "build",
-               "--bin=rust-discord-bot",
-               "--package=rust-discord-bot"
-            ],
-            "filter": {
-               "name": "rust-discord-bot",
-               "kind": "bin"
-            }
-         },
-         "args": [],
-         "cwd": "${workspaceFolder}"
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "Debug executable 'rust-discord-bot'",
+      "cargo": {
+        "args": [
+          "build",
+          "--bin=rust-discord-bot",
+          "--package=rust-discord-bot"
+        ],
+        "filter": {
+          "name": "rust-discord-bot",
+          "kind": "bin"
+        }
       },
-      {
-         "type": "lldb",
-         "request": "launch",
-         "name": "Debug unit tests in executable 'rust-discord-bot'",
-         "cargo": {
-            "args": [
-               "test",
-               "--no-run",
-               "--bin=rust-discord-bot",
-               "--package=rust-discord-bot"
-            ],
-            "filter": {
-               "name": "rust-discord-bot",
-               "kind": "bin"
-            }
-         },
-         "args": [],
-         "cwd": "${workspaceFolder}"
-      }
-   ]
+      "args": [],
+      "cwd": "${workspaceFolder}"
+    }
+  ]
 }

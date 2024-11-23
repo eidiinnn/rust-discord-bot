@@ -3,11 +3,11 @@ A Discord bot made in Rust with IA functionalities.
 
 ## How Install
 Simple way to install and run this project on your computer.
-### Install LLAMA3 by docker
+### Install LLAMA3.2 by docker
 I Recomend to use a computer with GPU, if you don't have it, remove the `--gpus=all` from the first command
 ```bash
 docker run -d --gpus=all -v ollama:/root/.ollama -p 11434:11434 --name ollama ollama/ollama
-docker exec -it ollama ollama run llama3
+docker exec -it ollama ollama run llama3.2
 ```
 
 ### Install Redis by docker
